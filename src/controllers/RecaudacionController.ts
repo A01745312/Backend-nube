@@ -1,12 +1,26 @@
 import { Request, Response } from 'express';
 import { CampaignService } from '../services/campaignService';
 
-export const configure = async (req: Request, res: Response) => {
-  try {
-    const { campaignId, purpose, goal } = req.body;
-    const result = await CampaignService.configure(campaignId, purpose, goal);
-    return res.status(200).json(result);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+class RecaudacionController {
+  private static instance: RecaudacionController;
+
+  public static getInstance(): RecaudacionController {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new RecaudacionController();
+    return this.instance;
   }
-};
+
+  public async configure(req: Request, res: Response) {
+    try {
+      const { campaignId, purpose, goal } = req.body;
+      const campaign = await CampaignService.configure(campaignId, purpose, goal);
+      res.status(200).json(campaign);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+}
+
+export default RecaudacionController.getInstance();
