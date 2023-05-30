@@ -10,7 +10,7 @@ class TrabajadorController {
     }
     this.instance = new TrabajadorController();
     return this.instance;
-  }
+  } 
 
   public async signup(req: Request, res: Response) {
     try {
