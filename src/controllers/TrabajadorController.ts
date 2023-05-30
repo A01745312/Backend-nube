@@ -1,22 +1,36 @@
 import { Request, Response } from 'express';
-import { WorkerService } from '../services/auth/workerService';
+import { WorkerService } from '../services/workerService';
 
-export const signup = async (req: Request, res: Response) => {
-  try {
-    const { username, password, email } = req.body;
-    const worker = await WorkerService.signup(username, password, email);
-    return res.status(201).json(worker);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+class TrabajadorController {
+  private static instance: TrabajadorController;
 
-export const signin = async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.body;
-    const tokens = await WorkerService.signin(username, password);
-    return res.status(200).json(tokens);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  public static getInstance(): TrabajadorController {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new TrabajadorController();
+    return this.instance;
   }
-};
+
+  public async signup(req: Request, res: Response) {
+    try {
+      const { username, password, email } = req.body;
+      const worker = await WorkerService.signup(username, password, email);
+      res.status(201).json(worker);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  public async signin(req: Request, res: Response) {
+    try {
+      const { username, password } = req.body;
+      const accessToken = await WorkerService.signin(username, password);
+      res.status(200).json({ accessToken });
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+}
+
+export default TrabajadorController.getInstance();
