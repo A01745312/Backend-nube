@@ -10,6 +10,9 @@ const RecaudacionModel = dynamodb.define("recaudacion", {
         nombre: joi.string().required(),
         correo: joi.string().required().email(),
         userId: joi.string().required(), // Para referencia al usuario
+        totalDonaciones: joi.number().default(0), // Total de donaciones para la campaña
+        proposito: joi.string().required(), // Propósito de la campaña
+        meta: joi.number().required(), // Meta de la campaña
     },
     tableName: `Recaudacion${PREFIX_TABLE}`,
 });
