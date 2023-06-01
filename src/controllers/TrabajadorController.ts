@@ -46,18 +46,14 @@ class TrabajadorController extends AbstractController {
       // Calculate the minimum and maximum overhead
       for (const recaudacion of recaudaciones) {
         const overhead = recaudacion.totalDonaciones - recaudacion.meta;
-        if (overhead > maxOverhead!) {
-          maxOverhead = overhead;
-        }
-        if (overhead < minOverhead!) {
+        if (minOverhead === null || overhead < minOverhead) {
           minOverhead = overhead;
         }
+        if (maxOverhead === null || overhead > maxOverhead) {
+          maxOverhead = overhead;
+        }
       }
-  
-      // Convert negative overhead values to positive
-      minOverhead = minOverhead !== null ? Math.abs(minOverhead) : null;
-      maxOverhead = maxOverhead !== null ? Math.abs(maxOverhead) : null;
-  
+
       res.status(200).send({
         status: "Success",
         recaudaciones: {
@@ -71,8 +67,7 @@ class TrabajadorController extends AbstractController {
       res.status(500).send({ code: error.code, message: error.message });
       return;
     }
-  }
-  
+}
   
   
   protected validateBody(type: any) {
