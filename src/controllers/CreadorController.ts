@@ -63,15 +63,15 @@ class CreadorController extends AbstractController {
         }
     }
 
-    private async verify(req:Request,res:Response){
-      const {email,code} = req.body;
-      try{
-          await this.cognitoService.verifyUser(email,code);
-          return res.status(200).send({message:"Correct verification"});
-      }catch(error:any){
-          res.status(500).send({code:error.code,message:error.message});
-      }
-  }
+    private async verify(req: Request, res: Response) {
+        const { email, code } = req.body;
+        try {
+            await this.cognitoService.verifyUser(email, code);
+            return res.status(200).send({ message: "Correct verification" });
+        } catch (error: any) {
+            res.status(500).send({ code: error.code, message: error.message });
+        }
+    }
 }
 
 export default CreadorController;

@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import UserModel, { UserRoles } from '../models/users';
+import UserModel, { UserRoles } from '../models/userNOSQL';
 
 export default class PermissionMiddleware {
   // Singleton
@@ -18,15 +18,17 @@ export default class PermissionMiddleware {
    */
   public async checkIsTrabajador(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await UserModel.findByPk(req.user);
-      if (user && user.role === UserRoles.TRABAJADORES) {
-        next();
-      } else {
-        res.status(401).send({ code: 'UserNotTrabajadorException', message: 'The logged account is not a worker' });
-      }
-    } catch (error: any) {
-      res.status(500).send({ code: error.code, message: error.message });
-    }
+		const user = await UserModel.get(req.user, '', {
+			AttributesToGet: ['role'],
+		});
+		if (user.attrs.role === UserRoles.TRABAJADOR) {
+			next();
+		} else {
+			res.status(401).send({ code: 'UserNotTrabajadorException', message: 'The logged account is not an trabajador' });
+		}
+	} catch (error:any) {
+		res.status(500).send({ code: error.code, message: error.message });
+	}
   }
 
   /**
@@ -34,14 +36,16 @@ export default class PermissionMiddleware {
    */
   public async checkIsCreador(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await UserModel.findByPk(req.user);
-      if (user && user.role === UserRoles.CREADOR) {
-        next();
-      } else {
-        res.status(401).send({ code: 'UserNotCreadorException', message: 'The logged account is not a creator' });
-      }
-    } catch (error: any) {
-      res.status(500).send({ code: error.code, message: error.message });
-    }
+		const user = await UserModel.get(req.user, '', {
+			AttributesToGet: ['role'],
+		});
+		if (user.attrs.role === UserRoles.CREADOR) {
+			next();
+		} else {
+			res.status(401).send({ code: 'UserNotCreadorException', message: 'The logged account is not an creador' });
+		}
+	} catch (error:any) {
+		res.status(500).send({ code: error.code, message: error.message });
+	}
   }
 }
