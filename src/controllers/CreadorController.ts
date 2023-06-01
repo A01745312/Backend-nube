@@ -1,46 +1,77 @@
-import { Request, Response } from 'express';
-import { CreatorService } from '../services/creatorService';
+import { Request, Response } from "express";
+import AbstractController from "./AbstractController";
+import UserModel from "../models/userNOSQL";
 
-class CreadorController {
-  private static instance: CreadorController;
-
-  public static getInstance(): CreadorController {
-    if (this.instance) {
-      return this.instance;
+class CreadorController extends AbstractController {
+    protected validateBody(type: any) {
+        throw new Error("Method not implemented.");
     }
-    this.instance = new CreadorController();
-    return this.instance;
-  }
 
-  public async signup(req: Request, res: Response) {
-    try {
-      const { username, password, email } = req.body;
-      const creator = await CreatorService.signup(username, password, email);
-      res.status(201).json(creator);
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+    //Singleton
+    private static instance: CreadorController;
+    public static getInstance(): AbstractController {
+        //si existe la instancia la regreso
+        if (this.instance) {
+            return this.instance;
+        }
+        //si no exite la creo
+        this.instance = new CreadorController("user");
+        return this.instance;
     }
-  }
 
-  public async verify(req: Request, res: Response) {
-    try {
-      const { verificationCode } = req.body;
-      const result = await CreatorService.verify(verificationCode);
-      res.status(200).json({ success: result });
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+    //Configurar las rutas del controlador
+    protected initRoutes(): void {
+        this.router.post("/signup", this.signUp.bind(this));
+        this.router.post("/signin", this.signIn.bind(this));
+        this.router.post("/verificar", this.verify.bind(this));
     }
-  }
 
-  public async signin(req: Request, res: Response) {
-    try {
-      const { username, password } = req.body;
-      const accessToken = await CreatorService.signin(username, password);
-      res.status(200).json({ accessToken });
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+    private async signUp(req: Request, res: Response) {
+        const { email, password, name, role } = req.body;
+        try {
+            //Create el usuario de cognito
+            const user = await this.cognitoService.signUpUser(email, password, [
+                {
+                    Name: "email",
+                    Value: email,
+                },
+            ]);
+            console.log("cognito user created", user);
+            //Creación del usuario dentro de la BDNoSQL-DynamoDB
+            await UserModel.create(
+                {
+                    awsCognitoId: user.UserSub,
+                    name,
+                    role,
+                    email,
+                },
+                { overwrite: false }
+            );
+            res.status(201).send({ message: "User signedUp" });
+        } catch (error: any) {
+            res.status(500).send({ code: error.code, message: error.message });
+        }
     }
+
+    private async signIn(req: Request, res: Response) {
+        const { email, password } = req.body;
+        try {
+            const login = await this.cognitoService.signInUser(email, password);
+            res.status(200).send({ ...login.AuthenticationResult });
+        } catch (error: any) {
+            res.status(500).send({ code: error.code, message: error.message });
+        }
+    }
+
+    private async verify(req:Request,res:Response){
+      const {email,code} = req.body;
+      try{
+          await this.cognitoService.verifyUser(email,code);
+          return res.status(200).send({message:"Correct verification"});
+      }catch(error:any){
+          res.status(500).send({code:error.code,message:error.message});
+      }
   }
 }
 
-export default CreadorController.getInstance();
+export default CreadorController;

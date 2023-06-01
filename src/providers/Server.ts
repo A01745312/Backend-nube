@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import AbstractController from "../controllers/AbstractController";
-import db from "../models";
 
 class Server {
     //Atributos
@@ -35,7 +34,6 @@ class Server {
     }
 
     public async init() {
-        await db.sequelize.sync();
         this.app.listen(this.port, () => {
             console.log(`Server:Running 🚀 @'http://localhost:${this.port}'`);
         });

@@ -32,14 +32,11 @@ class CognitoService {
 
   // Registro
   public async signUpUser(email: string, password: string, userAttr: { Name: CognitoAttributes; Value: string }[]) {
-    const filteredUserAttr = userAttr.filter(attr => attr.Name !== 'phone_number');
-
     const params = {
       ClientId: this.clientId,
       Password: password,
       Username: email,
       SecretHash: this.hashSecret(email),
-      UserAttributes: filteredUserAttr,
     };
 
     return await this.cognitoIdentity.signUp(params).promise();

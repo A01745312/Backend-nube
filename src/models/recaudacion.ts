@@ -1,3 +1,6 @@
+
+// MODIFICARLO PARA QUE SEA EN DYNAMO
+
 "use strict";
 
 import { Model } from "sequelize";
