@@ -1,41 +1,37 @@
-import { Router } from "express";
-import { AWSError,CognitoIdentityServiceProvider } from "aws-sdk";
-import { PromiseResult } from "aws-sdk/lib/request";
-
-//Middlewares
-import ValidationErrorMiddleware from "../middlewares/validationError";
-import AuthMiddleware from "../middlewares/authorization";
-import PermissionMiddleware from "../middlewares/permission";
-
-//Servicios
-import CognitoService from "../services/cognitoService";
+import { Router } from 'express';
+import db from '../models/index';
+import AuthMiddleware from '../middlewares/authorization';
+import PermissionMiddleware from '../middlewares/permission';
+import ValidationErrorMiddleware from '../middlewares/validationError';
+import CognitoService from '../services/cognitoService';
 
 export default abstract class AbstractController{
-    //Atributos
-    private _router:Router = Router();
-    private _prefix:string;
+    protected _router: Router = Router();
+    protected _prefix: string;
+
+    // Import the database models
+    protected db = db;
 
     protected handleErrors = ValidationErrorMiddleware.handleErrors;
     protected authMiddleware = AuthMiddleware.getInstance();
     protected permissionMiddleware = PermissionMiddleware.getInstance();
     protected cognitoService = CognitoService.getInstance();
 
-    public get router():Router{
-        return this._router;
-    }
-
-    public get prefix():string{
+    public get prefix(): string{
         return this._prefix;
     }
 
-    protected constructor(prefix:string){
-        this._prefix=prefix;
-        this.initRoutes();
-        
+    public get router(): Router{
+        return this._router;
     }
-    //Inicializar las rutas
-    protected abstract initRoutes():void;
-    //Validar el body de la petición
-    protected abstract validateBody(type:any):any;
 
+    protected constructor(prefix: string){
+        this._prefix = prefix;
+        this.initRoutes();
+    }
+
+    // Initialize routes
+    protected abstract initRoutes(): void;
+    // Validate the request body
+    protected abstract validateBody(type: any): any;
 }
