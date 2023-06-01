@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Op } from 'sequelize';
 import AbstractController from "./AbstractController";
-import Recaudacion from '../models/index';
+import Recaudacion from '../models/recaudacion';
 
 class TrabajadorController extends AbstractController {
     private static instance: TrabajadorController;
