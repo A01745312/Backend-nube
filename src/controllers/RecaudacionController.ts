@@ -21,12 +21,12 @@ class RecaudacionController extends AbstractController {
     }
 
     private async donacion(req: Request, res: Response) {
-        const { nombre, cantidad } = req.body;
+        const { id, cantidad } = req.body;
         try {
-            const recaudacion = await RecaudacionModel.get(nombre);
+            const recaudacion = await RecaudacionModel.get(id);
             if (recaudacion) {
                 const newDonationTotal = recaudacion.attrs.totalDonaciones + cantidad;
-                await RecaudacionModel.update({nombre, totalDonaciones: newDonationTotal });
+                await RecaudacionModel.update({id, totalDonaciones: newDonationTotal });
                 res.status(200).send({ message: 'Donación realizada con éxito.' });
             } else {
                 res.status(404).send({ message: 'La recaudación no existe.' });
