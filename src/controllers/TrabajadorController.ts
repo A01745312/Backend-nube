@@ -4,7 +4,6 @@ import UserModel from "../models/userNOSQL";
 import RecaudacionModel, { RecaudacionAttributes } from "../models/recaudacion";
 import streamToArray = require('stream-to-array');
 
-
 class TrabajadorController extends AbstractController {
   private static instance: TrabajadorController;
 
@@ -32,38 +31,33 @@ class TrabajadorController extends AbstractController {
     }
   }
 
-
-  
   private async overhead(req: Request, res: Response): Promise<void> {
-  try {
-    const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
+    try {
+      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
 
-    const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
-      console.log('totalDonaciones:', recaudacion.totalDonaciones);
-      console.log('meta:', recaudacion.meta);
+      const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
+        console.log('totalDonaciones:', recaudacion.totalDonaciones);
+        console.log('meta:', recaudacion.meta);
 
-      return {
-        nombre: recaudacion.nombre,
-        overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
-          ? recaudacion.totalDonaciones - recaudacion.meta
-          : null,
-      };
-    });
+        return {
+          nombre: recaudacion.nombre,
+          overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
+            ? recaudacion.totalDonaciones - recaudacion.meta
+            : null,
+        };
+      });
 
-    console.log('overhead:', overhead);
+      console.log('overhead:', overhead);
 
-    res.status(200).json({
-      status: "Success",
-      recaudaciones: overhead,
-    });
-  } catch (error: any) {
-    res.status(500).json({ code: error.code, message: error.message });
+      res.status(200).json({
+        status: "Success",
+        overhead: overhead,
+      });
+    } catch (error: any) {
+      res.status(500).json({ code: error.code, message: error.message });
+    }
   }
-}
 
-
-  
-  
   protected validateBody(type: any) {
     if (!type || Object.keys(type).length === 0) {
       throw new Error("The request body cannot be empty");

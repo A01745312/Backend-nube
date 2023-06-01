@@ -56,7 +56,7 @@ class TrabajadorController extends AbstractController_1.default {
                 console.log('overhead:', overhead);
                 res.status(200).json({
                     status: "Success",
-                    recaudaciones: overhead,
+                    overhead: overhead,
                 });
             }
             catch (error) {
