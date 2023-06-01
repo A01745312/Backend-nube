@@ -41,6 +41,8 @@
     "node-fetch": "^2.6.11",
     "sequelize": "^6.31.1",
     "sequelize-cli": "^6.6.0",
+    "stream": "^0.0.2",
+    "stream-to-array": "^2.3.0",
     "uuid": "^9.0.0"
   }
 }
