@@ -17,16 +17,17 @@ class RecaudacionController extends AbstractController {
     protected initRoutes(): void {
         this.router.post('/donacion', this.donacion.bind(this));
         this.router.post('/configurar', this.configurar.bind(this));
-        this.router.get('/totalDonaciones/:id', this.getTotalDonaciones.bind(this));
+        this.router.get('/totalDonaciones', this.getTotalDonaciones.bind(this));
     }
 
     private async donacion(req: Request, res: Response) {
-        const { id, cantidad } = req.body;
+        const { nombre, cantidad } = req.body;
         try {
-            const recaudacion = await RecaudacionModel.get(id);
+            const recaudacion = await RecaudacionModel.get(nombre);
+            console.log(recaudacion);
             if (recaudacion) {
                 const newDonationTotal = recaudacion.attrs.totalDonaciones + cantidad;
-                await RecaudacionModel.update({id, totalDonaciones: newDonationTotal });
+                await RecaudacionModel.update({nombre, totalDonaciones: newDonationTotal });
                 res.status(200).send({ message: 'Donación realizada con éxito.' });
             } else {
                 res.status(404).send({ message: 'La recaudación no existe.' });
@@ -45,7 +46,6 @@ class RecaudacionController extends AbstractController {
         if (!recaudacion) {
           // Si no se encuentra una recaudación existente, crear una nueva
           const newRecaudacion:RecaudacionAttributes = {
-            id: id,
             nombre: nombre,
             totalDonaciones: 0,
             proposito: proposito,
@@ -66,9 +66,9 @@ class RecaudacionController extends AbstractController {
     }
 
     private async getTotalDonaciones(req: Request, res: Response) {
-        const id = req.params.id;
+        const nombre = req.body;
         try {
-            const recaudacion = await RecaudacionModel.get(id);
+            const recaudacion = await RecaudacionModel.get(nombre);
             if (recaudacion) {
                 res.status(200).send({ totalDonaciones: recaudacion.attrs.totalDonaciones });
             } else {

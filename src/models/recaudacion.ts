@@ -3,7 +3,6 @@ import joi from "joi";
 import { PREFIX_TABLE } from "../config";
 
 export interface RecaudacionAttributes {
-  id: string,
   nombre: string;
   totalDonaciones: number;
   proposito: string;
@@ -11,10 +10,9 @@ export interface RecaudacionAttributes {
 }
 
 const RecaudacionModel = dynamodb.define<RecaudacionAttributes>("recaudacion", {
-  hashKey: "id",
+  hashKey: "nombre",
   timestamps: true,
   schema: {
-    id: joi.string().required(),
     nombre: joi.string().required(),
     totalDonaciones: joi.number().required(),
     proposito: joi.string().required(),
