@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { WorkerService } from '../services/workerService';
 
 class TrabajadorController {
   private static instance: TrabajadorController;

@@ -1,45 +1,49 @@
-'use strict';
+"use strict";
 
-import {Model} from 'sequelize';
+import { Model } from "sequelize";
 
-interface RecaudacionAttributes{
-  id:number,
-  nombre:string,
-  correo:string
+interface RecaudacionAttributes {
+    id: number;
+    nombre: string;
+    correo: string;
 }
 
-
-module.exports = (sequelize:any, DataTypes:any) => {
-  class Recaudacion extends Model<RecaudacionAttributes> implements RecaudacionAttributes {
-    id!:number;
-    nombre!:string;
-    correo!:string;    
-    static associate(models:any) {
-        // define association here
-        Recaudacion.belongsTo(models.User, {
-          foreignKey: 'userId'
-        });
-      }
-      
-  }
-  Recaudacion.init({
-    id:{
-      type:DataTypes.INTEGER,
-      allowNull:false,
-      primaryKey:true,
-      autoIncrement:true
-    },
-    nombre:{
-      type:DataTypes.STRING,
-      allowNull:false      
-    },
-    correo:{
-      type:DataTypes.STRING,
-      allowNull:false      
+module.exports = (sequelize: any, DataTypes: any) => {
+    class Recaudacion
+        extends Model<RecaudacionAttributes>
+        implements RecaudacionAttributes
+    {
+        id!: number;
+        nombre!: string;
+        correo!: string;
+        static associate(models: any) {
+            // define association here
+            Recaudacion.belongsTo(models.User, {
+                foreignKey: "userId",
+            });
+        }
     }
-  }, {
-    sequelize,
-    modelName: 'Recaudacion',
-  });
-  return Recaudacion;
+    Recaudacion.init(
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                primaryKey: true,
+                autoIncrement: true,
+            },
+            nombre: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            correo: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+        },
+        {
+            sequelize,
+            modelName: "Recaudacion",
+        }
+    );
+    return Recaudacion;
 };
