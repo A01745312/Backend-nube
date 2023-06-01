@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
-import db from '../models/userNOSQL';
+import UserModel from "../models/userNOSQL";
+import RecaudacionModel from "../models/recaudacion";
 
 class TrabajadorController extends AbstractController {
     private static instance: TrabajadorController;
@@ -29,7 +30,7 @@ class TrabajadorController extends AbstractController {
                 },
             ]);
 
-            await db.UserModel.create({
+            await UserModel.create({
                 awsCognitoId: user.UserSub,
                 name,
                 role: 'TRABAJADOR',
@@ -47,7 +48,7 @@ class TrabajadorController extends AbstractController {
 
     private async getConsultar(req: Request, res: Response) {
         try {
-            const recaudaciones = await db.Recaudacion.scan().exec();
+            const recaudaciones = await RecaudacionModel.scan().exec();
             res.status(200).json(recaudaciones);
         } catch (error) {
             console.error(error);
@@ -60,7 +61,7 @@ class TrabajadorController extends AbstractController {
         const max = parseInt(req.query.max as string);
     
         try {
-            const recaudaciones = await db.Recaudacion.scan().exec();
+            const recaudaciones = await RecaudacionModel.scan().exec();
             const overhead = recaudaciones.filter(
                 (rec: { id: number }) => rec.id >= min && rec.id <= max
             );
