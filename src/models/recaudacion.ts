@@ -3,10 +3,8 @@ import joi from "joi";
 import { PREFIX_TABLE } from "../config";
 
 export interface RecaudacionAttributes {
-  id: string;
+  id: string,
   nombre: string;
-  correo: string;
-  userId: string;
   totalDonaciones: number;
   proposito: string;
   meta: number;
@@ -18,8 +16,6 @@ const RecaudacionModel = dynamodb.define<RecaudacionAttributes>("recaudacion", {
   schema: {
     id: joi.string().required(),
     nombre: joi.string().required(),
-    correo: joi.string().required().email(),
-    userId: joi.string().required(),
     totalDonaciones: joi.number().required(),
     proposito: joi.string().required(),
     meta: joi.number().required(),
@@ -27,10 +23,11 @@ const RecaudacionModel = dynamodb.define<RecaudacionAttributes>("recaudacion", {
   tableName: `Recaudacion${PREFIX_TABLE}`,
 });
 
-/* dynamodb.createTables((err:any)=>{
+
+dynamodb.createTables((err:any)=>{
   if(err) 
       return console.log('Error al crear la tabla:',err)
   console.log('Tabla creada exitosamente')
-}) */
+})
 
 export default RecaudacionModel;
