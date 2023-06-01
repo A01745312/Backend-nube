@@ -20,33 +20,34 @@ class TrabajadorController extends AbstractController {
   
   private async consultar(req: Request, res: Response): Promise<void> {
     try {
-      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec() as unknown as RecaudacionAttributes[];
-      res.status(200).send({
+      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
+      res.status(200).json({
         status: "Success",
         recaudaciones: recaudaciones
       });
     } catch (error: any) {
-      res.status(500).send({ code: error.code, message: error.message });
+      res.status(500).json({ code: error.code, message: error.message });
     }
   }
   
   private async overhead(req: Request, res: Response): Promise<void> {
     try {
-      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec() as unknown as RecaudacionAttributes[];
+      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
       const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
         return {
           nombre: recaudacion.nombre,
           overhead: recaudacion.totalDonaciones - recaudacion.meta
         };
       });
-      res.status(200).send({
+      res.status(200).json({
         status: "Success",
         recaudaciones: overhead
       });
     } catch (error: any) {
-      res.status(500).send({ code: error.code, message: error.message });
+      res.status(500).json({ code: error.code, message: error.message });
     }
   }
+  
   
 
   protected validateBody(type: any) {
