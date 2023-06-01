@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractController_1 = __importDefault(require("./AbstractController"));
 const recaudacion_1 = __importDefault(require("../models/recaudacion"));
-const streamToArray = require("stream-to-array");
 class TrabajadorController extends AbstractController_1.default {
     static getInstance() {
         if (!this.instance) {
@@ -43,34 +42,25 @@ class TrabajadorController extends AbstractController_1.default {
     overhead(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const recaudacionesResult = yield streamToArray(recaudacion_1.default.scan().exec());
-                console.log("Recaudaciones Result:", recaudacionesResult);
-                const items = recaudacionesResult[0].Items;
-                const recaudaciones = items.map((item) => item.attrs);
-                let minOverhead = recaudaciones.length > 0 ? recaudaciones[0].totalDonaciones - recaudaciones[0].meta : null;
-                let maxOverhead = minOverhead;
-                // Calculate the minimum and maximum overhead
-                for (const recaudacion of recaudaciones) {
-                    const overhead = recaudacion.totalDonaciones - recaudacion.meta;
-                    if (minOverhead === null || overhead < minOverhead) {
-                        minOverhead = overhead;
-                    }
-                    if (maxOverhead === null || overhead > maxOverhead) {
-                        maxOverhead = overhead;
-                    }
-                }
-                res.status(200).send({
-                    status: "Success",
-                    recaudaciones: {
-                        minOverhead,
-                        maxOverhead,
-                    },
+                const recaudaciones = yield recaudacion_1.default.scan().exec().promise();
+                const overhead = recaudaciones.map((recaudacion) => {
+                    console.log('totalDonaciones:', recaudacion.totalDonaciones);
+                    console.log('meta:', recaudacion.meta);
+                    return {
+                        nombre: recaudacion.nombre,
+                        overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
+                            ? recaudacion.totalDonaciones - recaudacion.meta
+                            : null,
+                    };
                 });
-                return;
+                console.log('overhead:', overhead);
+                res.status(200).json({
+                    status: "Success",
+                    recaudaciones: overhead,
+                });
             }
             catch (error) {
-                res.status(500).send({ code: error.code, message: error.message });
-                return;
+                res.status(500).json({ code: error.code, message: error.message });
             }
         });
     }

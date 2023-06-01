@@ -31,43 +31,37 @@ class TrabajadorController extends AbstractController {
       res.status(500).json({ code: error.code, message: error.message });
     }
   }
+
+
   
   private async overhead(req: Request, res: Response): Promise<void> {
-    try {
-      const recaudacionesResult = await streamToArray(RecaudacionModel.scan().exec());
-      console.log("Recaudaciones Result:", recaudacionesResult);
-  
-      const items = recaudacionesResult[0].Items;
-      const recaudaciones: RecaudacionAttributes[] = items.map((item: any) => item.attrs);
-  
-      let minOverhead: number | null = recaudaciones.length > 0 ? recaudaciones[0].totalDonaciones - recaudaciones[0].meta : null;
-      let maxOverhead: number | null = minOverhead;
-  
-      // Calculate the minimum and maximum overhead
-      for (const recaudacion of recaudaciones) {
-        const overhead = recaudacion.totalDonaciones - recaudacion.meta;
-        if (minOverhead === null || overhead < minOverhead) {
-          minOverhead = overhead;
-        }
-        if (maxOverhead === null || overhead > maxOverhead) {
-          maxOverhead = overhead;
-        }
-      }
+  try {
+    const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
 
-      res.status(200).send({
-        status: "Success",
-        recaudaciones: {
-          minOverhead,
-          maxOverhead,
-        },
-      });
-  
-      return;
-    } catch (error: any) {
-      res.status(500).send({ code: error.code, message: error.message });
-      return;
-    }
+    const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
+      console.log('totalDonaciones:', recaudacion.totalDonaciones);
+      console.log('meta:', recaudacion.meta);
+
+      return {
+        nombre: recaudacion.nombre,
+        overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
+          ? recaudacion.totalDonaciones - recaudacion.meta
+          : null,
+      };
+    });
+
+    console.log('overhead:', overhead);
+
+    res.status(200).json({
+      status: "Success",
+      recaudaciones: overhead,
+    });
+  } catch (error: any) {
+    res.status(500).json({ code: error.code, message: error.message });
+  }
 }
+
+
   
   
   protected validateBody(type: any) {
