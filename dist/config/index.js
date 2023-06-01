@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.COGNITO_USER_POOL_ID = exports.COGNITO_APP_SECRET_HASH = exports.COGNITO_APP_CLIENT_ID = exports.PREFIX_TABLE = exports.AWS_SESSION_TOKEN = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY = exports.AWS_REGION = exports.DB_HOST = exports.NODE_ENV = exports.PORT = void 0;
+exports.PORT = process.env.PORT ? +process.env.PORT : 8080;
+exports.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
+exports.DB_HOST = process.env.DB_HOST ? process.env.DB_HOST : 'localhost';
+exports.AWS_REGION = process.env.AWS_REGION ? process.env.AWS_REGION : '';
+exports.AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY ? process.env.AWS_ACCESS_KEY : '';
+exports.AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY ? process.env.AWS_SECRET_ACCESS_KEY : '';
+exports.AWS_SESSION_TOKEN = process.env.AWS_SESSION_TOKEN ? process.env.AWS_SESSION_TOKEN : '';
+exports.PREFIX_TABLE = exports.NODE_ENV === "production" ? '' : '-DEV';
+exports.COGNITO_APP_CLIENT_ID = process.env.COGNITO_APP_CLIENT_ID ? process.env.COGNITO_APP_CLIENT_ID : '';
+exports.COGNITO_APP_SECRET_HASH = process.env.COGNITO_APP_SECRET_HASH ? process.env.COGNITO_APP_SECRET_HASH : '';
+exports.COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID ? process.env.COGNITO_USER_POOL_ID : '';
