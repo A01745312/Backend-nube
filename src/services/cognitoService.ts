@@ -62,6 +62,7 @@ class CognitoService {
       ClientId: this.clientId,
       ConfirmationCode: code,
       Username: email,
+      SecretHash: this.hashSecret(email)
     };
     return await this.cognitoIdentity.confirmSignUp(params).promise();
   }

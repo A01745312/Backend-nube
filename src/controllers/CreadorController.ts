@@ -15,7 +15,7 @@ class CreadorController extends AbstractController {
             return this.instance;
         }
         //si no exite la creo
-        this.instance = new CreadorController("user");
+        this.instance = new CreadorController("creador");
         return this.instance;
     }
 

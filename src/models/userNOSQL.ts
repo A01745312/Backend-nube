@@ -27,10 +27,10 @@ const UserModel = dynamodb.define("usuario", {
 });
 
 //Solo ejecutar la primera vez y despues comentar
-/*dynamodb.createTables((err:any)=>{
+/* dynamodb.createTables((err:any)=>{
     if(err) 
         return console.log('Error al crear la tabla:',err)
     console.log('Tabla creada exitosamente')
-})*/
+}) */
 
 export default UserModel;

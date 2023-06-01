@@ -27,4 +27,10 @@ const RecaudacionModel = dynamodb.define<RecaudacionAttributes>("recaudacion", {
   tableName: `Recaudacion${PREFIX_TABLE}`,
 });
 
+/* dynamodb.createTables((err:any)=>{
+  if(err) 
+      return console.log('Error al crear la tabla:',err)
+  console.log('Tabla creada exitosamente')
+}) */
+
 export default RecaudacionModel;
