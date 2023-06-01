@@ -2,8 +2,8 @@ import dynamodb from "../services/dynamoService";
 import joi from "joi";
 import { PREFIX_TABLE } from "../config";
 
-interface RecaudacionAttributes {
-  id: number;
+export interface RecaudacionAttributes {
+  id: string;
   nombre: string;
   correo: string;
   userId: string;
@@ -16,7 +16,7 @@ const RecaudacionModel = dynamodb.define<RecaudacionAttributes>("recaudacion", {
   hashKey: "id",
   timestamps: true,
   schema: {
-    id: joi.number().required(),
+    id: joi.string().required(),
     nombre: joi.string().required(),
     correo: joi.string().required().email(),
     userId: joi.string().required(),

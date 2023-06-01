@@ -79,7 +79,6 @@ class TrabajadorController extends AbstractController {
   
 
   protected validateBody(type: any) {
-    // A simple validation function that checks if the body is empty
     if (!type || Object.keys(type).length === 0) {
       throw new Error("The request body cannot be empty");
     }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
-import RecaudacionModel from "../models/recaudacion";
+import RecaudacionModel from '../models/recaudacion';
+import joi from "joi";
 
 class RecaudacionController extends AbstractController {
   private static instance: RecaudacionController;
@@ -21,10 +22,10 @@ class RecaudacionController extends AbstractController {
   private async donacion(req: Request, res: Response) {
     const { id, cantidad } = req.body;
     try {
-      let recaudacion = await RecaudacionModel.get(id);
+      const recaudacion = await RecaudacionModel.get(id);
       if (recaudacion) {
-        recaudacion += cantidad;
-        await recaudacion.save();
+        const newDonationTotal = recaudacion.attrs.totalDonaciones + cantidad;
+        await RecaudacionModel.update({ id, totalDonaciones: newDonationTotal });
         res.status(200).send({ message: 'Donación realizada con éxito.' });
       } else {
         res.status(404).send({ message: 'La recaudación no existe.' });
@@ -38,11 +39,9 @@ class RecaudacionController extends AbstractController {
   private async configurar(req: Request, res: Response) {
     const { id, proposito, meta } = req.body;
     try {
-      let recaudacion = await RecaudacionModel.get(id);
+      const recaudacion = await RecaudacionModel.get(id);
       if (recaudacion) {
-        recaudacion = proposito;
-        recaudacion = meta;
-        await recaudacion.save();
+        await RecaudacionModel.update({ id, proposito, meta });
         res.status(200).send({ message: 'Campaña configurada con éxito.' });
       } else {
         res.status(404).send({ message: 'La recaudación no existe.' });
@@ -52,13 +51,13 @@ class RecaudacionController extends AbstractController {
       res.status(500).send({ message: 'Error al configurar la campaña.' });
     }
   }
-
+  
   private async getTotalDonaciones(req: Request, res: Response) {
     const id = req.params.id;
     try {
-      let recaudacion = await RecaudacionModel.get(id);
+      const recaudacion = await RecaudacionModel.get(id);
       if (recaudacion) {
-        res.status(200).send({ totalDonaciones: recaudacion });
+        res.status(200).send({ totalDonaciones: recaudacion.attrs.totalDonaciones });
       } else {
         res.status(404).send({ message: 'La recaudación no existe.' });
       }
@@ -67,32 +66,22 @@ class RecaudacionController extends AbstractController {
       res.status(500).send({ message: 'Error al obtener el total de donaciones.' });
     }
   }
+  
 
-  protected validateBody(type: any): void {
-    // Asegúrate de que el objeto type contenga todas las propiedades necesarias
-    if (!type || typeof type !== 'object') {
-      throw new Error('El cuerpo de la solicitud no puede estar vacío');
-    }
-
-    const { id, cantidad, proposito, meta } = type;
-
-    if (typeof id !== 'string' || id.trim() === '') {
-      throw new Error('El campo "id" es requerido y debe ser una cadena no vacía');
-    }
-
-    if (typeof cantidad !== 'number' || isNaN(cantidad) || cantidad <= 0) {
-      throw new Error('El campo "cantidad" es requerido y debe ser un número positivo');
-    }
-
-    if (typeof proposito !== 'string' || proposito.trim() === '') {
-      throw new Error('El campo "proposito" es requerido y debe ser una cadena no vacía');
-    }
-
-    if (typeof meta !== 'number' || isNaN(meta) || meta <= 0) {
-      throw new Error('El campo "meta" es requerido y debe ser un número positivo');
-    }
+  protected validateBody(body: any): boolean {
+    const schema = joi.object({
+      id: joi.string().required(),
+      nombre: joi.string().required(),
+      correo: joi.string().required().email(),
+      userId: joi.string().required(),
+      totalDonaciones: joi.number().required(),
+      proposito: joi.string().required(),
+      meta: joi.number().required(),
+    });
+  
+    const { error } = schema.validate(body);
+    return !error;
   }
 }
 
 export default RecaudacionController;
-
