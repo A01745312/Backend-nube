@@ -34,29 +34,40 @@ class TrabajadorController extends AbstractController {
   private async overhead(req: Request, res: Response): Promise<void> {
     try {
       const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
-
-      const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
-        console.log('totalDonaciones:', recaudacion.totalDonaciones);
-        console.log('meta:', recaudacion.meta);
-
+  
+      const validRecaudaciones = recaudaciones.filter(recaudacion => {
+        const isValidDonaciones = typeof recaudacion.totalDonaciones === 'number' && !isNaN(recaudacion.totalDonaciones);
+        const isValidMeta = typeof recaudacion.meta === 'number' && !isNaN(recaudacion.meta);
+        return isValidDonaciones && isValidMeta;
+      });
+  
+      if (validRecaudaciones.length === 0) {
+        throw new Error('No hay recaudaciones válidas');
+      }
+  
+      const overheadList = validRecaudaciones.map(recaudacion => {
         return {
           nombre: recaudacion.nombre,
-          overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
-            ? recaudacion.totalDonaciones - recaudacion.meta
-            : null,
+          overhead: recaudacion.totalDonaciones - recaudacion.meta
         };
       });
-
-      console.log('overhead:', overhead);
-
+  
+      const overheadMin = Math.min(...overheadList.map(item => item.overhead));
+      const overheadMax = Math.max(...overheadList.map(item => item.overhead));
+  
+      console.log('Overhead mínimo:', overheadMin);
+      console.log('Overhead máximo:', overheadMax);
+  
       res.status(200).json({
         status: "Success",
-        overhead: overhead,
+        overheadMin: overheadMin,
+        overheadMax: overheadMax,
       });
     } catch (error: any) {
       res.status(500).json({ code: error.code, message: error.message });
     }
   }
+  
 
   protected validateBody(type: any) {
     if (!type || Object.keys(type).length === 0) {

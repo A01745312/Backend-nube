@@ -43,20 +43,28 @@ class TrabajadorController extends AbstractController_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const recaudaciones = yield recaudacion_1.default.scan().exec().promise();
-                const overhead = recaudaciones.map((recaudacion) => {
-                    console.log('totalDonaciones:', recaudacion.totalDonaciones);
-                    console.log('meta:', recaudacion.meta);
+                const validRecaudaciones = recaudaciones.filter(recaudacion => {
+                    const isValidDonaciones = typeof recaudacion.totalDonaciones === 'number' && !isNaN(recaudacion.totalDonaciones);
+                    const isValidMeta = typeof recaudacion.meta === 'number' && !isNaN(recaudacion.meta);
+                    return isValidDonaciones && isValidMeta;
+                });
+                if (validRecaudaciones.length === 0) {
+                    throw new Error('No hay recaudaciones válidas');
+                }
+                const overheadList = validRecaudaciones.map(recaudacion => {
                     return {
                         nombre: recaudacion.nombre,
-                        overhead: recaudacion.totalDonaciones !== undefined && recaudacion.meta !== undefined
-                            ? recaudacion.totalDonaciones - recaudacion.meta
-                            : null,
+                        overhead: recaudacion.totalDonaciones - recaudacion.meta
                     };
                 });
-                console.log('overhead:', overhead);
+                const overheadMin = Math.min(...overheadList.map(item => item.overhead));
+                const overheadMax = Math.max(...overheadList.map(item => item.overhead));
+                console.log('Overhead mínimo:', overheadMin);
+                console.log('Overhead máximo:', overheadMax);
                 res.status(200).json({
                     status: "Success",
-                    overhead: overhead,
+                    overheadMin: overheadMin,
+                    overheadMax: overheadMax,
                 });
             }
             catch (error) {
