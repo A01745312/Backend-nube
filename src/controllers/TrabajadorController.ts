@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import UserModel from "../models/userNOSQL";
-import RecaudacionModel from "../models/recaudacion";
+import RecaudacionModel, { RecaudacionAttributes } from "../models/recaudacion";
 
 class TrabajadorController extends AbstractController {
   private static instance: TrabajadorController;
@@ -14,68 +14,39 @@ class TrabajadorController extends AbstractController {
   }
 
   protected initRoutes(): void {
-    this.router.post('/generateUser', this.generateUser.bind(this));
-    this.router.get('/consultar', this.authMiddleware.verifyToken.bind(this.authMiddleware), this.permissionMiddleware.checkIsTrabajador.bind(this.permissionMiddleware), this.getConsultar.bind(this));
-    this.router.get('/overhead', this.authMiddleware.verifyToken.bind(this.authMiddleware), this.permissionMiddleware.checkIsTrabajador.bind(this.permissionMiddleware), this.getOverhead.bind(this));
+    this.router.get('/consultar', this.authMiddleware.verifyToken.bind(this.authMiddleware), this.permissionMiddleware.checkIsTrabajador.bind(this.permissionMiddleware), this.consultar.bind(this));
+    this.router.get('/overhead', this.authMiddleware.verifyToken.bind(this.authMiddleware), this.permissionMiddleware.checkIsTrabajador.bind(this.permissionMiddleware), this.overhead.bind(this));
   }
-
-  public async generateUser(req: Request, res: Response) {
-    const { email, password, name } = req.body;
+  
+  private async consultar(req: Request, res: Response): Promise<void> {
     try {
-      const user = await this.cognitoService.signUpUser(email, password, [
-        {
-          Name: 'email',
-          Value: email,
-        },
-      ]);
-
-      await UserModel.create({
-        awsCognitoId: user.UserSub,
-        name,
-        role: 'TRABAJADOR',
-        email,
-      }, {
-        overwrite: false,
+      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec() as unknown as RecaudacionAttributes[];
+      res.status(200).send({
+        status: "Success",
+        recaudaciones: recaudaciones
       });
-
-      res.status(201).send({ message: 'Trabajador creado exitosamente.' });
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ message: 'No se pudo crear el trabajador.' });
+      res.status(500).send({ code: error.code, message: error.message });
     }
   }
-
-  private async getConsultar(req: Request, res: Response) {
+  
+  private async overhead(req: Request, res: Response): Promise<void> {
     try {
-      const recaudaciones = await RecaudacionModel.scan().exec();
-      res.status(200).json(recaudaciones);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error al obtener las recaudaciones");
+      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec() as unknown as RecaudacionAttributes[];
+      const overhead = recaudaciones.map((recaudacion: RecaudacionAttributes) => {
+        return {
+          nombre: recaudacion.nombre,
+          overhead: recaudacion.totalDonaciones - recaudacion.meta
+        };
+      });
+      res.status(200).send({
+        status: "Success",
+        recaudaciones: overhead
+      });
+    } catch (error: any) {
+      res.status(500).send({ code: error.code, message: error.message });
     }
   }
-
-  private async getOverhead(req: Request, res: Response) {
-    const min = parseInt(req.query.min as string);
-    const max = parseInt(req.query.max as string);
-  
-    try {
-      const recaudaciones = await RecaudacionModel.scan().exec();
-      const overhead: any[] = [];
-  
-      for await (const rec of recaudaciones) {
-        if (rec.id >= min && rec.id <= max) {
-          overhead.push(rec);
-        }
-      }
-  
-      res.status(200).json(overhead);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error al obtener el overhead de recaudaciones");
-    }
-  }
-  
   
 
   protected validateBody(type: any) {
@@ -86,3 +57,4 @@ class TrabajadorController extends AbstractController {
 }
 
 export default TrabajadorController;
+
