@@ -35,11 +35,15 @@ class TrabajadorController extends AbstractController {
     try {
       const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
   
+      console.log('Recaudaciones:', recaudaciones);
+  
       const validRecaudaciones = recaudaciones.filter(recaudacion => {
-        const isValidDonaciones = typeof recaudacion.totalDonaciones === 'number' && !isNaN(recaudacion.totalDonaciones);
-        const isValidMeta = typeof recaudacion.meta === 'number' && !isNaN(recaudacion.meta);
+        const isValidDonaciones = Number.isInteger(Math.round(recaudacion.totalDonaciones));
+        const isValidMeta = Number.isInteger(Math.round(recaudacion.meta));
         return isValidDonaciones && isValidMeta;
       });
+  
+      console.log('Recaudaciones válidas:', validRecaudaciones);
   
       if (validRecaudaciones.length === 0) {
         throw new Error('No hay recaudaciones válidas');
@@ -48,9 +52,13 @@ class TrabajadorController extends AbstractController {
       const overheadList = validRecaudaciones.map(recaudacion => {
         return {
           nombre: recaudacion.nombre,
+          totalDonaciones: recaudacion.totalDonaciones,
+          meta: recaudacion.meta,
           overhead: recaudacion.totalDonaciones - recaudacion.meta
         };
       });
+  
+      console.log('Lista de overhead:', overheadList);
   
       const overheadMin = Math.min(...overheadList.map(item => item.overhead));
       const overheadMax = Math.max(...overheadList.map(item => item.overhead));
@@ -68,7 +76,7 @@ class TrabajadorController extends AbstractController {
     }
   }
   
-
+  
   protected validateBody(type: any) {
     if (!type || Object.keys(type).length === 0) {
       throw new Error("The request body cannot be empty");
