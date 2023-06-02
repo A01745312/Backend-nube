@@ -48,7 +48,8 @@ AWS_SECRET_ACCESS_KEY=your_secret_access_key
 AWS_REGION=your_aws_region
 DYNAMODB_TABLE_NAME=your_dynamodb_table_name
 Asegúrate de reemplazar los valores `your_access_key_id`, `your_secret_access_key`, `your_aws_region` y `your_dynamodb_table_name` con tu propia configuración.
-4. Ejecuta el servidor localmente con el comando `npm start`.
+4. Transpilar el tsc `npm run build`.
+5. Ejecuta el servidor localmente con el comando `npm run start pm`.
 
 
 
