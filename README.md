@@ -50,15 +50,7 @@ DYNAMODB_TABLE_NAME=your_dynamodb_table_name
 Asegúrate de reemplazar los valores `your_access_key_id`, `your_secret_access_key`, `your_aws_region` y `your_dynamodb_table_name` con tu propia configuración.
 4. Ejecuta el servidor localmente con el comando `npm start`.
 
-## Endpoints
 
-El backend expone los siguientes endpoints:
-
-- `GET /recaudaciones`: Obtiene todas las recaudaciones almacenadas en la base de datos.
-- `POST /recaudaciones`: Crea una nueva recaudación.
-- `GET /recaudaciones/:id`: Obtiene los detalles de una recaudación específica.
-- `PUT /recaudaciones/:id`: Actualiza los detalles de una recaudación específica.
-- `DELETE /recaudaciones/:id`: Elimina una recaudación específica.
 
 ## Contribuciones
 
