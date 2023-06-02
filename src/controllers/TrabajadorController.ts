@@ -33,14 +33,20 @@ class TrabajadorController extends AbstractController {
 
   private async overhead(req: Request, res: Response): Promise<void> {
     try {
-      const recaudaciones: RecaudacionAttributes[] = await RecaudacionModel.scan().exec().promise() as unknown as RecaudacionAttributes[];
+      const response: any = await RecaudacionModel.scan().exec().promise();
   
+      if (!response || !response.Items) {
+        throw new Error('No hay recaudaciones válidas');
+      }
+  
+      const recaudaciones: RecaudacionAttributes[] = response.Items as RecaudacionAttributes[];
+      
       console.log('Recaudaciones:', recaudaciones);
   
-      const validRecaudaciones = recaudaciones.filter(recaudacion => {
-        const isValidDonaciones = Number.isInteger(Math.round(recaudacion.totalDonaciones));
-        const isValidMeta = Number.isInteger(Math.round(recaudacion.meta));
-        return isValidDonaciones && isValidMeta;
+      const validRecaudaciones = recaudaciones.filter((recaudacion: RecaudacionAttributes) => {
+        const isValidMeta = Number.isInteger(recaudacion.meta);
+        const isValidDonaciones = recaudacion.totalDonaciones !== 0;
+        return isValidMeta && isValidDonaciones;
       });
   
       console.log('Recaudaciones válidas:', validRecaudaciones);
@@ -52,7 +58,7 @@ class TrabajadorController extends AbstractController {
       const overheadList = validRecaudaciones.map(recaudacion => {
         return {
           nombre: recaudacion.nombre,
-          totalDonaciones: recaudacion.totalDonaciones,
+          totalDonativo: recaudacion.totalDonaciones,
           meta: recaudacion.meta,
           overhead: recaudacion.totalDonaciones - recaudacion.meta
         };
@@ -75,6 +81,7 @@ class TrabajadorController extends AbstractController {
       res.status(500).json({ code: error.code, message: error.message });
     }
   }
+  
   
   
   protected validateBody(type: any) {

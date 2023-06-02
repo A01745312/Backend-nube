@@ -42,12 +42,16 @@ class TrabajadorController extends AbstractController_1.default {
     overhead(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const recaudaciones = yield recaudacion_1.default.scan().exec().promise();
+                const response = yield recaudacion_1.default.scan().exec().promise();
+                if (!response || !response.Items) {
+                    throw new Error('No hay recaudaciones válidas');
+                }
+                const recaudaciones = response.Items;
                 console.log('Recaudaciones:', recaudaciones);
-                const validRecaudaciones = recaudaciones.filter(recaudacion => {
-                    const isValidDonaciones = Number.isInteger(Math.round(recaudacion.totalDonaciones));
-                    const isValidMeta = Number.isInteger(Math.round(recaudacion.meta));
-                    return isValidDonaciones && isValidMeta;
+                const validRecaudaciones = recaudaciones.filter((recaudacion) => {
+                    const isValidMeta = Number.isInteger(recaudacion.meta);
+                    const isValidDonaciones = recaudacion.totalDonaciones !== 0;
+                    return isValidMeta && isValidDonaciones;
                 });
                 console.log('Recaudaciones válidas:', validRecaudaciones);
                 if (validRecaudaciones.length === 0) {
@@ -56,7 +60,7 @@ class TrabajadorController extends AbstractController_1.default {
                 const overheadList = validRecaudaciones.map(recaudacion => {
                     return {
                         nombre: recaudacion.nombre,
-                        totalDonaciones: recaudacion.totalDonaciones,
+                        totalDonativo: recaudacion.totalDonaciones,
                         meta: recaudacion.meta,
                         overhead: recaudacion.totalDonaciones - recaudacion.meta
                     };
