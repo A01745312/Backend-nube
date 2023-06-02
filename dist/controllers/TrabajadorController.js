@@ -53,7 +53,7 @@ class TrabajadorController extends AbstractController_1.default {
                     const overhead = recaudaciones.map((recaudacion) => {
                         return {
                             nombre: recaudacion.attrs.nombre,
-                            overhead: Math.abs(recaudacion.attrs.totalDonaciones - recaudacion.attrs.meta)
+                            overhead: recaudacion.attrs.totalDonaciones - recaudacion.attrs.meta
                         };
                     });
                     res.status(200).json({
