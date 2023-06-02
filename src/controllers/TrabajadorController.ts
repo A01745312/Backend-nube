@@ -32,6 +32,7 @@ class TrabajadorController extends AbstractController {
     }
   }
   
+
   private async overhead(req: Request, res: Response): Promise<void> {
     try {
       const stream = await RecaudacionModel.scan().exec();
@@ -48,9 +49,10 @@ class TrabajadorController extends AbstractController {
         const overhead = recaudaciones.map((recaudacion: any) => {
           return {
             nombre: recaudacion.attrs.nombre,
-            overhead: recaudacion.attrs.totalDonaciones - recaudacion.attrs.meta 
-          }
+            overhead: Math.abs(recaudacion.attrs.totalDonaciones - recaudacion.attrs.meta)
+          };
         });
+  
         res.status(200).json({
           status: "Success",
           recaudaciones: overhead
@@ -67,6 +69,7 @@ class TrabajadorController extends AbstractController {
       res.status(500).json({ code: error.code, message: error.message });
     }
   }
+  
   
   
   
