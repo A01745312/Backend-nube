@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractController_1 = __importDefault(require("./AbstractController"));
 const recaudacion_1 = __importDefault(require("../models/recaudacion"));
+const toArray = require('stream-to-array');
 class TrabajadorController extends AbstractController_1.default {
     static getInstance() {
         if (!this.instance) {
@@ -42,39 +43,32 @@ class TrabajadorController extends AbstractController_1.default {
     overhead(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield recaudacion_1.default.scan().exec().promise();
-                if (!response || !response.Items) {
-                    throw new Error('No hay recaudaciones válidas');
+                const stream = yield recaudacion_1.default.scan().exec();
+                const data = yield toArray(stream); // convierte stream a matriz
+                console.log('Data:', data); // Imprime data
+                // Asegurémonos de que data es un array y que el primer elemento tiene la propiedad Items
+                if (Array.isArray(data) && data.length > 0 && data[0].Items) {
+                    const recaudaciones = data[0].Items;
+                    console.log('Recaudaciones:', recaudaciones); // Imprime recaudaciones
+                    const overhead = recaudaciones.map((recaudacion) => {
+                        return {
+                            nombre: recaudacion.attrs.nombre,
+                            overhead: recaudacion.attrs.totalDonaciones - recaudacion.attrs.meta
+                        };
+                    });
+                    res.status(200).json({
+                        status: "Success",
+                        recaudaciones: overhead
+                    });
                 }
-                const recaudaciones = response.Items;
-                console.log('Recaudaciones:', recaudaciones);
-                const validRecaudaciones = recaudaciones.filter((recaudacion) => {
-                    const isValidMeta = Number.isInteger(recaudacion.meta);
-                    const isValidDonaciones = recaudacion.totalDonaciones !== 0;
-                    return isValidMeta && isValidDonaciones;
-                });
-                console.log('Recaudaciones válidas:', validRecaudaciones);
-                if (validRecaudaciones.length === 0) {
-                    throw new Error('No hay recaudaciones válidas');
+                else {
+                    // Si data no tiene la forma que esperamos, imprime un error y devuelve una respuesta vacía
+                    console.error('Data no tiene la forma esperada:', data);
+                    res.status(200).json({
+                        status: "Success",
+                        recaudaciones: []
+                    });
                 }
-                const overheadList = validRecaudaciones.map(recaudacion => {
-                    return {
-                        nombre: recaudacion.nombre,
-                        totalDonativo: recaudacion.totalDonaciones,
-                        meta: recaudacion.meta,
-                        overhead: recaudacion.totalDonaciones - recaudacion.meta
-                    };
-                });
-                console.log('Lista de overhead:', overheadList);
-                const overheadMin = Math.min(...overheadList.map(item => item.overhead));
-                const overheadMax = Math.max(...overheadList.map(item => item.overhead));
-                console.log('Overhead mínimo:', overheadMin);
-                console.log('Overhead máximo:', overheadMax);
-                res.status(200).json({
-                    status: "Success",
-                    overheadMin: overheadMin,
-                    overheadMax: overheadMax,
-                });
             }
             catch (error) {
                 res.status(500).json({ code: error.code, message: error.message });
