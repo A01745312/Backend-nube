@@ -9,11 +9,6 @@
 ## Ricardo Ramírez Condado - A01379299
 ## Paola Danae López Pérez- A01745689
 
-# Backend-nube
-
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![GitHub issues](https://img.shields.io/github/issues/A01745312/Backend-nube)](https://github.com/A01745312/Backend-nube/issues)
-[![GitHub stars](https://img.shields.io/github/stars/A01745312/Backend-nube)](https://github.com/A01745312/Backend-nube/stargazers)
 
 Este proyecto consiste en el desarrollo de un backend para el registro y administración de apoyo a recaudaciones con un beneficio social. El backend proporciona una serie de operaciones que permiten la creación de usuarios, verificación de creadores, autenticación, donaciones a campañas y consulta de saldo.
 
