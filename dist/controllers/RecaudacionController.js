@@ -25,7 +25,7 @@ class RecaudacionController extends AbstractController_1.default {
     }
     initRoutes() {
         this.router.post('/donacion', this.donacion.bind(this));
-        this.router.post('/configurar', this.configurar.bind(this));
+        this.router.post('/configurar', this.authMiddleware.verifyToken.bind(this.authMiddleware), this.permissionMiddleware.checkIsCreador.bind(this.permissionMiddleware), this.configurar.bind(this));
         this.router.get('/totalDonaciones', this.getTotalDonaciones.bind(this));
     }
     donacion(req, res) {
