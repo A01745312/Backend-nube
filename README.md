@@ -1,6 +1,8 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/A01745312/Backend-nube)](https://github.com/A01745312/Backend-nube/issues)
 [![GitHub stars](https://img.shields.io/github/stars/A01745312/Backend-nube)](https://github.com/A01745312/Backend-nube/stargazers)
+<img src="https://github.com/devicons/devicon/blob/master/icons/nodejs/nodejs-original-wordmark.svg" title="NodeJS" alt="NodeJS" width="40" height="40"/>&nbsp;
+  <img src="https://github.com/devicons/devicon/blob/master/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" title="AWS" alt="AWS" width="40" height="40"/>&nbsp;
 
 # Backend-nube
 ## Diego Alejandro Balderas Tlahuitzo - A01745336
